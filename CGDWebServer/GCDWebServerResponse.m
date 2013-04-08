@@ -28,6 +28,7 @@
 #import <sys/stat.h>
 
 #import "GCDWebServerPrivate.h"
+#import "GCDWebServerResponse.h"
 
 @implementation GCDWebServerResponse
 
@@ -202,6 +203,59 @@
 	}];
 	id response = [self initWithHTML:html];
 	return response;
+}
+
+@end
+
+@implementation GCDWebServerDataBlockResponseState
+@end
+
+@implementation GCDWebServerDataBlockResponse
+
+- (id)initWithContentType:(NSString*)type
+                 preBlock:(GCDWebServerDataBlock) preBlock
+               fetchBlock:(GCDWebServerDataBlock) fetchBlock
+                postBlock:(GCDWebServerDataBlock) postBlock {
+    if ((self = [super initWithContentType: type contentLength: -1])) {
+        DCHECK(preBlock);
+        DCHECK(fetchBlock);
+        DCHECK(postBlock);
+        _dataPreBlock   = [preBlock copy];
+        _dataFetchBlock = [fetchBlock copy];
+        _dataPostBlock  = [postBlock copy];
+    }
+    return self;
+}
+
+- (BOOL)open {
+	BOOL ret = [super open];
+    
+    _dataBlockState = [GCDWebServerDataBlockResponseState new];
+    _dataPreBlock(_dataBlockState);
+    
+    return ret;
+}
+
+- (NSInteger)read:(void*)buffer maxLength:(NSUInteger)length {
+	DCHECK(_offset >= 0);
+	NSInteger size = 0;
+
+	while (_offset < length) {
+        NSData *nextChunk = _dataFetchBlock(_dataBlockState);
+        if (!nextChunk)
+            break;
+
+		size = MIN(nextChunk.length, length);
+		bcopy((char*)nextChunk.bytes, buffer, size);
+		_offset += size;
+	}
+	return size;
+}
+
+- (BOOL)close {
+    BOOL ret = [super close];
+    _dataPostBlock(_dataBlockState);
+	return ret;
 }
 
 @end

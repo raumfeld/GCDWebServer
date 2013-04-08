@@ -61,7 +61,7 @@
 @end
 
 @interface GCDWebServerDataResponse : GCDWebServerResponse {
-@private
+@protected
   NSData* _data;
   NSInteger _offset;
 }
@@ -76,6 +76,26 @@
 - (id)initWithText:(NSString*)text;  // Encodes using UTF-8
 - (id)initWithHTML:(NSString*)html;  // Encodes using UTF-8
 - (id)initWithHTMLTemplate:(NSString*)path variables:(NSDictionary*)variables;  // Simple template system that replaces all occurences of "%variable%" with corresponding value (encodes using UTF-8)
+@end
+
+@interface GCDWebServerDataBlockResponseState : NSObject
+@property (nonatomic) NSError *error;
+@property (nonatomic, retain) id customData;
+@end
+
+typedef NSData* (^GCDWebServerDataBlock)     (GCDWebServerDataBlockResponseState *stateObject);
+
+@interface GCDWebServerDataBlockResponse : GCDWebServerDataResponse {
+@private
+GCDWebServerDataBlock _dataPreBlock;   // prepare block is called before fetch block
+GCDWebServerDataBlock _dataFetchBlock; // fetch block, is called until no more data is available
+GCDWebServerDataBlock _dataPostBlock;  // is called after fetch block returns no more data
+GCDWebServerDataBlockResponseState* _dataBlockState; // state holder that is used between calls of _data*Block
+}
+- (id)initWithContentType:(NSString*)type
+                 preBlock:(GCDWebServerDataBlock) preBlock
+               fetchBlock:(GCDWebServerDataBlock) fetchBlock
+                postBlock:(GCDWebServerDataBlock) postBlock;
 @end
 
 @interface GCDWebServerFileResponse : GCDWebServerResponse {
