@@ -28,6 +28,8 @@
 #import "GCDWebServerRequest.h"
 #import "GCDWebServerResponse.h"
 
+@class GCDWebServerHandler;
+
 typedef GCDWebServerRequest* (^GCDWebServerMatchBlock)(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery);
 typedef GCDWebServerResponse* (^GCDWebServerProcessBlock)(GCDWebServerRequest* request);
 
@@ -40,7 +42,8 @@ typedef GCDWebServerResponse* (^GCDWebServerProcessBlock)(GCDWebServerRequest* r
 @property(nonatomic, strong) NSMutableArray *handlers;
 @property(nonatomic, readonly, getter=isRunning) BOOL running;
 @property(nonatomic, readonly) NSUInteger port;
-- (void)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)processBlock;
+- (GCDWebServerHandler*)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)processBlock;
+- (void)removeHandler:(GCDWebServerHandler*) handler;
 - (void)removeAllHandlers;
 
 - (BOOL)start;  // Default is 8080 port and computer name
@@ -58,8 +61,8 @@ typedef GCDWebServerResponse* (^GCDWebServerProcessBlock)(GCDWebServerRequest* r
 @end
 
 @interface GCDWebServer (Handlers)
-- (void)addDefaultHandlerForMethod:(NSString*)method requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block;
-- (void)addHandlerForBasePath:(NSString*)basePath localPath:(NSString*)localPath indexFilename:(NSString*)indexFilename cacheAge:(NSUInteger)cacheAge;  // Base path is recursive and case-sensitive
-- (void)addHandlerForMethod:(NSString*)method path:(NSString*)path requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block;  // Path is case-insensitive
-- (void)addHandlerForMethod:(NSString*)method pathRegex:(NSString*)regex requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block;  // Regular expression is case-insensitive
+- (GCDWebServerHandler*)addDefaultHandlerForMethod:(NSString*)method requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block;
+- (GCDWebServerHandler*)addHandlerForBasePath:(NSString*)basePath localPath:(NSString*)localPath indexFilename:(NSString*)indexFilename cacheAge:(NSUInteger)cacheAge;  // Base path is recursive and case-sensitive
+- (GCDWebServerHandler*)addHandlerForMethod:(NSString*)method path:(NSString*)path requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block;  // Path is case-insensitive
+- (GCDWebServerHandler*)addHandlerForMethod:(NSString*)method pathRegex:(NSString*)regex requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block;  // Regular expression is case-insensitive
 @end

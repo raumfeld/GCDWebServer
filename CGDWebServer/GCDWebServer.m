@@ -130,14 +130,18 @@ static void _SignalHandler(int signal) {
 
 - (void)dealloc {
     if (_source)
-        [self stop];
-    self.handlers = nil;
+		[self stop];
+	self.handlers = nil;
 }
 
-- (void)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)handlerBlock {
-  DCHECK(_source == NULL);
-  GCDWebServerHandler* handler = [[GCDWebServerHandler alloc] initWithMatchBlock:matchBlock processBlock:handlerBlock];
-  [self.handlers insertObject:handler atIndex:0];
+- (GCDWebServerHandler *)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)handlerBlock {
+	GCDWebServerHandler* handler = [[GCDWebServerHandler alloc] initWithMatchBlock:matchBlock processBlock:handlerBlock];
+	[self.handlers insertObject:handler atIndex:0];
+    return handler;
+}
+
+- (void)removeHandler:(GCDWebServerHandler*) handler {
+    [self.handlers removeObject: handler];
 }
 
 - (void)removeAllHandlers {
@@ -308,8 +312,8 @@ static void _NetServiceClientCallBack(CFNetServiceRef service, CFStreamError* er
 
 @implementation GCDWebServer (Handlers)
 
-- (void)addDefaultHandlerForMethod:(NSString*)method requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block {
-	[self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
+- (GCDWebServerHandler *)addDefaultHandlerForMethod:(NSString*)method requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block {
+	return [self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
 		
 		return [[class alloc] initWithMethod:requestMethod url:requestURL headers:requestHeaders path:urlPath query:urlQuery];
 		
@@ -346,9 +350,9 @@ static void _NetServiceClientCallBack(CFNetServiceRef service, CFStreamError* er
 	return [GCDWebServerDataResponse responseWithHTML:html];
 }
 
-- (void)addHandlerForBasePath:(NSString*)basePath localPath:(NSString*)localPath indexFilename:(NSString*)indexFilename cacheAge:(NSUInteger)cacheAge {
+- (GCDWebServerHandler*)addHandlerForBasePath:(NSString*)basePath localPath:(NSString*)localPath indexFilename:(NSString*)indexFilename cacheAge:(NSUInteger)cacheAge {
 	if ([basePath hasPrefix:@"/"] && [basePath hasSuffix:@"/"]) {
-		[self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
+		return [self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
 			
 			if (![requestMethod isEqualToString:@"GET"]) {
 				return nil;
@@ -413,9 +417,9 @@ static void _NetServiceClientCallBack(CFNetServiceRef service, CFStreamError* er
 	}
 }
 
-- (void)addHandlerForMethod:(NSString*)method path:(NSString*)path requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block {
+- (GCDWebServerHandler*)addHandlerForMethod:(NSString*)method path:(NSString*)path requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block {
 	if ([path hasPrefix:@"/"] && [class isSubclassOfClass:[GCDWebServerRequest class]]) {
-		[self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
+		return [self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
 			
 			if (![requestMethod isEqualToString:method]) {
 				return nil;
@@ -431,10 +435,10 @@ static void _NetServiceClientCallBack(CFNetServiceRef service, CFStreamError* er
 	}
 }
 
-- (void)addHandlerForMethod:(NSString*)method pathRegex:(NSString*)regex requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block {
+- (GCDWebServerHandler*)addHandlerForMethod:(NSString*)method pathRegex:(NSString*)regex requestClass:(Class)class processBlock:(GCDWebServerProcessBlock)block {
 	NSRegularExpression* expression = [NSRegularExpression regularExpressionWithPattern:regex options:NSRegularExpressionCaseInsensitive error:NULL];
 	if (expression && [class isSubclassOfClass:[GCDWebServerRequest class]]) {
-		[self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
+		return [self addHandlerWithMatchBlock:^GCDWebServerRequest *(NSString* requestMethod, NSURL* requestURL, NSDictionary* requestHeaders, NSString* urlPath, NSDictionary* urlQuery) {
 			
 			if (![requestMethod isEqualToString:method]) {
 				return nil;
