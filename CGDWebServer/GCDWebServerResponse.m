@@ -228,12 +228,10 @@
 }
 
 - (BOOL)open {
-	BOOL ret = [super open];
-    
     _dataBlockState = [GCDWebServerDataBlockResponseState new];
     _dataPreBlock(_dataBlockState);
     
-    return ret;
+    return YES;
 }
 
 - (NSInteger)read:(void*)buffer maxLength:(NSUInteger)length {
@@ -253,9 +251,8 @@
 }
 
 - (BOOL)close {
-    BOOL ret = [super close];
     _dataPostBlock(_dataBlockState);
-	return ret;
+	return YES;
 }
 
 @end
