@@ -83,7 +83,7 @@
 @property (nonatomic, retain) id customData;
 @end
 
-typedef NSData* (^GCDWebServerDataBlock)     (GCDWebServerDataBlockResponseState *stateObject);
+typedef NSData* (^GCDWebServerDataBlock)     (GCDWebServerDataBlockResponseState *stateObject, NSInteger maxLength);
 
 @interface GCDWebServerDataBlockResponse : GCDWebServerResponse {
 @private
