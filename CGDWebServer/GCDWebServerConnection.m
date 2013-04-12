@@ -299,7 +299,8 @@ static dispatch_queue_t _formatterQueue = NULL;
 		}];
 		if ([_response hasBody]) {
 			CFHTTPMessageSetHeaderFieldValue(_responseMessage, CFSTR("Content-Type"), (__bridge CFStringRef)_response.contentType);
-			CFHTTPMessageSetHeaderFieldValue(_responseMessage, CFSTR("Content-Length"), (__bridge CFStringRef)[NSString stringWithFormat:@"%i", (int)_response.contentLength]);
+            if (-1 < (int)_response.contentLength)
+                CFHTTPMessageSetHeaderFieldValue(_responseMessage, CFSTR("Content-Length"), (__bridge CFStringRef)[NSString stringWithFormat:@"%i", (int)_response.contentLength]);
 		}
 		[self _writeHeadersWithCompletionBlock:^(BOOL success) {
 			
