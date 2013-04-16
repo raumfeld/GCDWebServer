@@ -213,9 +213,9 @@
 @implementation GCDWebServerDataBlockResponse
 
 - (id)initWithContentType:(NSString*)type
-                 preBlock:(GCDWebServerDataBlock) preBlock
-               fetchBlock:(GCDWebServerDataBlock) fetchBlock
-                postBlock:(GCDWebServerDataBlock) postBlock {
+                 preBlock:(GCDWebServerPreDataBlock) preBlock
+               fetchBlock:(GCDWebServerFetchDataBlock) fetchBlock
+                postBlock:(GCDWebServerPostDataBlock) postBlock {
     if ((self = [super initWithContentType: type contentLength: -1])) {
         DCHECK(preBlock);
         DCHECK(fetchBlock);
@@ -228,9 +228,12 @@
 }
 
 - (BOOL)open {
+    __block NSMutableDictionary *additionalHeaders = [NSMutableDictionary new];
     _dataBlockState = [GCDWebServerDataBlockResponseState new];
-    _dataPreBlock(_dataBlockState, 0);
-    
+    _dataPreBlock(_dataBlockState, additionalHeaders);
+    [additionalHeaders enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        [self setValue:obj forAdditionalHeader:key];
+    }];
     return nil == _dataBlockState.error;
 }
 
@@ -251,7 +254,7 @@
 }
 
 - (BOOL)close {
-    _dataPostBlock(_dataBlockState, 0);
+    _dataPostBlock(_dataBlockState);
 	return YES;
 }
 
