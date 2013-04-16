@@ -230,7 +230,8 @@
 - (BOOL)open {
     _dataBlockState = [GCDWebServerDataBlockResponseState new];
     _dataPreBlock(_dataBlockState, 0);
-    return YES;
+    
+    return nil == _dataBlockState.error;
 }
 
 - (NSInteger)read:(void*)buffer maxLength:(NSUInteger)length {
@@ -238,7 +239,7 @@
 	NSInteger size = 0;
 
     NSData *nextChunk = _dataFetchBlock(_dataBlockState, length);
-    if (!nextChunk)
+    if (!nextChunk || _dataBlockState.error)
         return 0;
     
     size = nextChunk.length;
