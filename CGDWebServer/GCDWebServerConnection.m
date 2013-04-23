@@ -208,7 +208,7 @@ static dispatch_queue_t _formatterQueue = NULL;
 	if (result > 0) {
 		dispatch_data_t wrapper = dispatch_data_create(buffer, result, NULL, DISPATCH_DATA_DESTRUCTOR_FREE);
 		[self _writeBuffer:wrapper withCompletionBlock:^(BOOL success) {
-			
+
 			if (success) {
 				[self _writeBodyWithCompletionBlock:block];
 			} else {
@@ -216,6 +216,7 @@ static dispatch_queue_t _formatterQueue = NULL;
 			}
 			
 		}];
+        dispatch_release(wrapper);
 	} else if (result < 0) {
 		LOG_ERROR(@"Failed reading response body on socket %i (error %i)", _socket, (int)result);
 		block(NO);
@@ -392,7 +393,7 @@ static dispatch_queue_t _formatterQueue = NULL;
 			if (_request) {
 				if (_request.hasBody) {
 					if (extraData.length <= _request.contentLength) {
-						NSString* expectHeader = (__bridge id)CFHTTPMessageCopyHeaderFieldValue(_requestMessage, CFSTR("Expect"));
+						NSString* expectHeader = (__bridge_transfer NSString*)CFHTTPMessageCopyHeaderFieldValue(_requestMessage, CFSTR("Expect"));
 						if (expectHeader) {
 							if ([expectHeader caseInsensitiveCompare:@"100-continue"] == NSOrderedSame) {
 								[self _writeData:_continueData withCompletionBlock:^(BOOL success) {
