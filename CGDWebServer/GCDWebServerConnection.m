@@ -190,6 +190,7 @@ static dispatch_queue_t _formatterQueue = NULL;
 
 - (void)_writeData:(NSData*)data withCompletionBlock:(WriteDataCompletionBlock)block {
   dispatch_data_t buffer = dispatch_data_create(data.bytes, data.length, dispatch_get_current_queue(), ^{
+    [data self]; // keeps ARC from releasing data too early.
   });
   [self _writeBuffer:buffer withCompletionBlock:block];
 }
