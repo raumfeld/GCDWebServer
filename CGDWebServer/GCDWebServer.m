@@ -123,7 +123,8 @@ static void _SignalHandler(int signal) {
 
 - (id)init {
 	if ((self = [super init])) {
-		self.handlers = [NSMutableArray array];
+		_handlers = [NSMutableArray array];
+        _handlersLock = [NSObject new];
 	}
 	return self;
 }
@@ -131,22 +132,46 @@ static void _SignalHandler(int signal) {
 - (void)dealloc {
     if (_source)
 		[self stop];
-	self.handlers = nil;
 }
 
 - (GCDWebServerHandler *)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)handlerBlock {
 	GCDWebServerHandler* handler = [[GCDWebServerHandler alloc] initWithMatchBlock:matchBlock processBlock:handlerBlock];
-	[self.handlers insertObject:handler atIndex:0];
+    @synchronized(_handlersLock) {
+        [_handlers insertObject:handler atIndex:0];
+    }
     return handler;
 }
 
 - (void)removeHandler:(GCDWebServerHandler*) handler {
-    [self.handlers removeObject: handler];
+    @synchronized(_handlersLock) {
+        [_handlers removeObject: handler];
+    }
 }
 
 - (void)removeAllHandlers {
   DCHECK(_source == NULL);
-  [self.handlers removeAllObjects];
+  @synchronized(_handlersLock) {
+      [_handlers removeAllObjects];
+  }
+}
+
+- (GCDWebServerRequest*) requestAndHandler: (GCDWebServerHandler **) handler
+                                 forMethod: (NSString *) requestMethod
+                                       url: (NSURL *) requestURL
+                                   headers: (NSDictionary *) requestHeaders
+                                      path: (NSString *) requestPath
+                                     query: (NSDictionary *) requestQuery
+{
+    @synchronized(_handlersLock) {
+        for (GCDWebServerHandler *hndlr in _handlers) {
+            GCDWebServerRequest *request = hndlr.matchBlock(requestMethod, requestURL, requestHeaders, requestPath, requestQuery);
+            if (request) {
+                *handler = hndlr;
+                return request;
+            }
+        }
+        return nil;
+    }
 }
 
 - (BOOL)start {

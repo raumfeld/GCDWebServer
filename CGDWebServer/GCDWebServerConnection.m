@@ -385,12 +385,14 @@ static dispatch_queue_t _formatterQueue = NULL;
 			}
 			NSDictionary* requestHeaders = (__bridge_transfer id)CFHTTPMessageCopyAllHeaderFields(_requestMessage);
 			DCHECK(requestHeaders);
-			for (_handler in _server.handlers) {
-				_request = _handler.matchBlock(requestMethod, requestURL, requestHeaders, requestPath, requestQuery);
-				if (_request) {
-					break;
-				}
-			}
+            GCDWebServerHandler *localHandler = nil;
+            _request = [_server requestAndHandler: &localHandler
+                                        forMethod: requestMethod
+                                              url: requestURL
+                                          headers: requestHeaders
+                                             path: requestPath
+                                            query: requestQuery];
+            _handler = localHandler;
 			if (_request) {
 				if (_request.hasBody) {
 					if (extraData.length <= _request.contentLength) {

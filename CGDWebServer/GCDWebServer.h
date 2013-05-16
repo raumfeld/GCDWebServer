@@ -38,13 +38,20 @@ typedef GCDWebServerResponse* (^GCDWebServerProcessBlock)(GCDWebServerRequest* r
     NSUInteger _port;
     dispatch_source_t _source;
     CFNetServiceRef _service;
+    NSObject* _handlersLock;
+    NSMutableArray* _handlers;
 }
-@property(nonatomic, strong) NSMutableArray *handlers;
 @property(nonatomic, readonly, getter=isRunning) BOOL running;
 @property(nonatomic, readonly) NSUInteger port;
 - (GCDWebServerHandler*)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)processBlock;
 - (void)removeHandler:(GCDWebServerHandler*) handler;
 - (void)removeAllHandlers;
+- (GCDWebServerRequest*) requestAndHandler: (GCDWebServerHandler **) handler
+                                 forMethod: (NSString *) requestMethod
+                                       url: (NSURL *) requestURL
+                                   headers: (NSDictionary *) requestHeaders
+                                      path: (NSString *) requestPath
+                                     query: (NSDictionary *) requestQuery;
 
 - (BOOL)start;  // Default is 8080 port and computer name
 - (BOOL)startWithPort:(NSUInteger)port bonjourName:(NSString*)name;  // Pass nil name to disable Bonjour or empty string to use computer name
