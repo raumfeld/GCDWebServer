@@ -217,7 +217,6 @@ static dispatch_queue_t _formatterQueue = NULL;
 			}
 			
 		}];
-        dispatch_release(wrapper);
 	} else if (result < 0) {
 		LOG_ERROR(@"Failed reading response body on socket %i (error %i)", _socket, (int)result);
 		block(NO);
