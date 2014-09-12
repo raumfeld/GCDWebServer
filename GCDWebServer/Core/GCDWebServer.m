@@ -144,6 +144,7 @@ static void _ExecuteMainThreadRunLoopSources() {
   id<GCDWebServerDelegate> __unsafe_unretained _delegate;
   dispatch_queue_t _syncQueue;
   dispatch_semaphore_t _sourceSemaphore;
+  NSObject *_handlersLock;
   NSMutableArray* _handlers;
   NSInteger _activeConnections;  // Accessed through _syncQueue only
   BOOL _connected;  // Accessed on main thread only
@@ -206,6 +207,7 @@ static void _DisconnectTimerCallBack(CFRunLoopTimerRef timer, void* info) {
     _syncQueue = dispatch_queue_create([NSStringFromClass([self class]) UTF8String], DISPATCH_QUEUE_SERIAL);
     _sourceSemaphore = dispatch_semaphore_create(0);
     _handlers = [[NSMutableArray alloc] init];
+    _handlersLock = [NSObject new];
     CFRunLoopTimerContext context = {0, (ARC_BRIDGE void*)self, NULL, NULL, NULL};
     _disconnectTimer = CFRunLoopTimerCreate(kCFAllocatorDefault, HUGE_VAL, HUGE_VAL, 0, 0, _DisconnectTimerCallBack, &context);
     CFRunLoopAddTimer(CFRunLoopGetMain(), _disconnectTimer, kCFRunLoopCommonModes);
@@ -223,7 +225,9 @@ static void _DisconnectTimerCallBack(CFRunLoopTimerRef timer, void* info) {
   
   CFRunLoopTimerInvalidate(_disconnectTimer);
   CFRelease(_disconnectTimer);
-  ARC_RELEASE(_handlers);
+  @synchronized(_handlersLock) {
+    ARC_RELEASE(_handlers);
+  }
   ARC_DISPATCH_RELEASE(_sourceSemaphore);
   ARC_DISPATCH_RELEASE(_syncQueue);
   
@@ -351,18 +355,43 @@ static void _DisconnectTimerCallBack(CFRunLoopTimerRef timer, void* info) {
 - (GCDWebServerHandler*)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)handlerBlock {
     DCHECK(_options == nil);
     GCDWebServerHandler* handler = [[GCDWebServerHandler alloc] initWithMatchBlock:matchBlock processBlock:handlerBlock];
-    [_handlers insertObject:handler atIndex:0];
+    @synchronized(_handlersLock) {
+        [_handlers insertObject:handler atIndex:0];
+    }
     ARC_RELEASE(handler);
     return handler;
 }
 
 - (void) removeHandler: (GCDWebServerHandler *) handler {
-    [_handlers removeObject: handler];
+    @synchronized(_handlersLock) {
+        [_handlers removeObject: handler];
+    }
 }
 
 - (void)removeAllHandlers {
   DCHECK(_options == nil);
-  [_handlers removeAllObjects];
+    @synchronized(_handlersLock) {
+        [_handlers removeAllObjects];
+    }
+}
+
+- (GCDWebServerRequest*) requestAndHandler: (GCDWebServerHandler **) handler
+                                 forMethod: (NSString *) requestMethod
+                                       url: (NSURL *) requestURL
+                                   headers: (NSDictionary *) requestHeaders
+                                      path: (NSString *) requestPath
+                                     query: (NSDictionary *) requestQuery
+{
+    @synchronized(_handlersLock) {
+        for (GCDWebServerHandler *hndlr in _handlers) {
+            GCDWebServerRequest *request = hndlr.matchBlock(requestMethod, requestURL, requestHeaders, requestPath, requestQuery);
+            if (request) {
+                *handler = hndlr;
+                return request;
+            }
+        }
+        return nil;
+    }
 }
 
 static void _NetServiceClientCallBack(CFNetServiceRef service, CFStreamError* error, void* info) {

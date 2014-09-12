@@ -307,6 +307,13 @@ extern NSString* const GCDWebServerAuthenticationMethod_DigestAccess;
  */
 - (void)removeAllHandlers;
 
+- (GCDWebServerRequest*) requestAndHandler: (GCDWebServerHandler **) handler
+                                 forMethod: (NSString *) requestMethod
+                                       url: (NSURL *) requestURL
+                                   headers: (NSDictionary *) requestHeaders
+                                      path: (NSString *) requestPath
+                                     query: (NSDictionary *) requestQuery;
+
 /**
  *  Starts the server with explicit options. This method is the designated way
  *  to start the server.

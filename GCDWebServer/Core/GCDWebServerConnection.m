@@ -532,12 +532,14 @@ static inline NSUInteger _ScanHexNumber(const void* bytes, NSUInteger size) {
       NSString* queryString = requestURL ? ARC_BRIDGE_RELEASE(CFURLCopyQueryString((CFURLRef)requestURL, NULL)) : nil;  // Don't use -[NSURL query] to make sure query is not unescaped;
       NSDictionary* requestQuery = queryString ? GCDWebServerParseURLEncodedForm(queryString) : @{};
       if (requestMethod && requestURL && requestHeaders && requestPath && requestQuery) {
-        for (_handler in _server.handlers) {
-          _request = ARC_RETAIN(_handler.matchBlock(requestMethod, requestURL, requestHeaders, requestPath, requestQuery));
-          if (_request) {
-            break;
-          }
-        }
+        GCDWebServerHandler *localHandler = nil;
+        _request = [_server requestAndHandler: &localHandler
+                                      forMethod: requestMethod
+                                            url: requestURL
+                                        headers: requestHeaders
+                                           path: requestPath
+                                          query: requestQuery];
+        _handler = localHandler;
         if (_request) {
           if ([_request hasBody]) {
             [_request prepareForWriting];
