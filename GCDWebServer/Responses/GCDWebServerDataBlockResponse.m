@@ -32,7 +32,7 @@
 
 - (BOOL)open {
     _dataBlockState = [GCDWebServerDataBlockResponseState new];
-    _dataPreBlock(_dataBlockState);
+    _dataPreBlock(_dataBlockState, 0);
     
     return YES;
 }
@@ -41,20 +41,20 @@
     DCHECK(_offset >= 0);
     NSInteger size = 0;
     
-    while (_offset < length) {
-        NSData *nextChunk = _dataFetchBlock(_dataBlockState);
-        if (!nextChunk)
-            break;
-        
-        size = MIN(nextChunk.length, length);
-        bcopy((char*)nextChunk.bytes, buffer, size);
-        _offset += size;
-    }
+    NSData *nextChunk = _dataFetchBlock(_dataBlockState, length);
+    if (!nextChunk)
+        return 0;
+    
+    size = nextChunk.length;
+    DCHECK(size <= length);
+    bcopy((char*)nextChunk.bytes, buffer, size);
+    _offset += size;
+    
     return size;
 }
 
 - (void)close {
-    _dataPostBlock(_dataBlockState);
+    _dataPostBlock(_dataBlockState, 0);
 }
 
 @end
