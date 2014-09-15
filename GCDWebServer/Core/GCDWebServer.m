@@ -781,6 +781,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
         } processBlock:block];
     } else {
         DNOT_REACHED();
+        return nil;
     }
 }
 
@@ -800,6 +801,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
         } processBlock:block];
     } else {
         DNOT_REACHED();
+        return nil;
     }
 }
 
@@ -910,6 +912,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
       }];
   } else {
       DNOT_REACHED();
+      return nil;
   }
 }
 
