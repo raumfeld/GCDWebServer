@@ -281,9 +281,6 @@ It's also possible to replace the logging system used by GCDWebServer by a custo
 #define LOG_WARNING(...)
 #define LOG_ERROR(...)
 #define LOG_EXCEPTION(__EXCEPTION__)
-
-#define DCHECK(__CONDITION__)  // Should not do anything if NDEBUG is defined or abort if __CONDITION__ is false
-#define DNOT_REACHED()  // Should not do anything if NDEBUG is defined
 ```
 
 Advanced Example 1: Implementing HTTP Redirects
