@@ -78,8 +78,13 @@
 extern GCDWebServerLogLevel GCDLogLevel;
 extern void GCDLogMessage(GCDWebServerLogLevel level, NSString* format, ...) NS_FORMAT_FUNCTION(2, 3);
 
-#define LOG_VERBOSE(...) do { if (GCDLogLevel <= kGCDWebServerLogLevel_Verbose) GCDLogMessage(kGCDWebServerLogLevel_Verbose, __VA_ARGS__); } while (0)
+#ifdef NDEBUG
+#define LOG_DEBUG(...)
+#else
 #define LOG_DEBUG(...) do { if (GCDLogLevel <= kGCDWebServerLogLevel_Debug) GCDLogMessage(kGCDWebServerLogLevel_Debug, __VA_ARGS__); } while (0)
+#endif 
+
+#define LOG_VERBOSE(...) do { if (GCDLogLevel <= kGCDWebServerLogLevel_Verbose) GCDLogMessage(kGCDWebServerLogLevel_Verbose, __VA_ARGS__); } while (0)
 #define LOG_INFO(...) do { if (GCDLogLevel <= kGCDWebServerLogLevel_Info) GCDLogMessage(kGCDWebServerLogLevel_Info, __VA_ARGS__); } while (0)
 #define LOG_WARNING(...) do { if (GCDLogLevel <= kGCDWebServerLogLevel_Warning) GCDLogMessage(kGCDWebServerLogLevel_Warning, __VA_ARGS__); } while (0)
 #define LOG_ERROR(...) do { if (GCDLogLevel <= kGCDWebServerLogLevel_Error) GCDLogMessage(kGCDWebServerLogLevel_Error, __VA_ARGS__); } while (0)
