@@ -353,7 +353,6 @@ static void _DisconnectTimerCallBack(CFRunLoopTimerRef timer, void* info) {
 }
 
 - (GCDWebServerHandler*)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)handlerBlock {
-    DCHECK(_options == nil);
     GCDWebServerHandler* handler = [[GCDWebServerHandler alloc] initWithMatchBlock:matchBlock processBlock:handlerBlock];
     @synchronized(_handlersLock) {
         [_handlers insertObject:handler atIndex:0];
@@ -369,7 +368,6 @@ static void _DisconnectTimerCallBack(CFRunLoopTimerRef timer, void* info) {
 }
 
 - (void)removeAllHandlers {
-  DCHECK(_options == nil);
     @synchronized(_handlersLock) {
         [_handlers removeAllObjects];
     }
