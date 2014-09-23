@@ -22,6 +22,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		9E4B164D19D164A0001D7242 /* GCDWebServerDataBlockResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E4B164C19D164A0001D7242 /* GCDWebServerDataBlockResponse.m */; };
+		9E4B164E19D164A0001D7242 /* GCDWebServerDataBlockResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E4B164C19D164A0001D7242 /* GCDWebServerDataBlockResponse.m */; };
 		E208D149167B76B700500836 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E208D148167B76B700500836 /* CFNetwork.framework */; };
 		E208D1B3167BB17E00500836 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E208D1B2167BB17E00500836 /* CoreServices.framework */; };
 		E221128F1690B6470048D2B2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E221128E1690B6470048D2B2 /* main.m */; };
@@ -101,6 +103,8 @@
 
 /* Begin PBXFileReference section */
 		8DD76FB20486AB0100D96B5E /* GCDWebServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GCDWebServer; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E4B164B19D164A0001D7242 /* GCDWebServerDataBlockResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDWebServerDataBlockResponse.h; sourceTree = "<group>"; };
+		9E4B164C19D164A0001D7242 /* GCDWebServerDataBlockResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDWebServerDataBlockResponse.m; sourceTree = "<group>"; };
 		E208D148167B76B700500836 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		E208D1B2167BB17E00500836 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		E221125A1690B4DE0048D2B2 /* GCDWebServer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCDWebServer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -296,6 +300,8 @@
 			children = (
 				E28BAE2C18F99C810095C089 /* GCDWebServerDataResponse.h */,
 				E28BAE2D18F99C810095C089 /* GCDWebServerDataResponse.m */,
+				9E4B164B19D164A0001D7242 /* GCDWebServerDataBlockResponse.h */,
+				9E4B164C19D164A0001D7242 /* GCDWebServerDataBlockResponse.m */,
 				E28BAE2E18F99C810095C089 /* GCDWebServerErrorResponse.h */,
 				E28BAE2F18F99C810095C089 /* GCDWebServerErrorResponse.m */,
 				E28BAE3018F99C810095C089 /* GCDWebServerFileResponse.h */,
@@ -431,6 +437,7 @@
 				E28BAE4618F99C810095C089 /* GCDWebServerDataResponse.m in Sources */,
 				E28BAE3818F99C810095C089 /* GCDWebServerFunctions.m in Sources */,
 				E28BAE4A18F99C810095C089 /* GCDWebServerFileResponse.m in Sources */,
+				9E4B164D19D164A0001D7242 /* GCDWebServerDataBlockResponse.m in Sources */,
 				E28BAE4418F99C810095C089 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				E28BAE3A18F99C810095C089 /* GCDWebServerRequest.m in Sources */,
 				E28BAE3418F99C810095C089 /* GCDWebServer.m in Sources */,
@@ -452,6 +459,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2A0E80B18F3432600C580B1 /* GCDWebDAVServer.m in Sources */,
+				9E4B164E19D164A0001D7242 /* GCDWebServerDataBlockResponse.m in Sources */,
 				E28BAE4918F99C810095C089 /* GCDWebServerErrorResponse.m in Sources */,
 				E28BAE4518F99C810095C089 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				E28BAE4B18F99C810095C089 /* GCDWebServerFileResponse.m in Sources */,

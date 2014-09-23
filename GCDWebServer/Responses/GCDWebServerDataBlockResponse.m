@@ -23,6 +23,8 @@
         DCHECK(preBlock);
         DCHECK(fetchBlock);
         DCHECK(postBlock);
+        
+        self.contentType = type;
         _dataPreBlock   = [preBlock copy];
         _dataFetchBlock = [fetchBlock copy];
         _dataPostBlock  = [postBlock copy];
@@ -30,20 +32,21 @@
     return self;
 }
 
-- (BOOL)open {
+- (BOOL)open:(NSError**)error {
     __block NSMutableDictionary *additionalHeaders = [NSMutableDictionary new];
     _dataBlockState = [GCDWebServerDataBlockResponseState new];
     _dataPreBlock(_dataBlockState, additionalHeaders);
     [additionalHeaders enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         [self setValue:obj forAdditionalHeader:key];
     }];
-
+    
     return nil == _dataBlockState.error;
 }
 
-- (NSInteger)read:(void*)buffer maxLength:(NSUInteger)length {
+- (NSData*)readData:(NSError**)error {
     DCHECK(_offset >= 0);
-    NSInteger size = 0;
+    NSUInteger size = 0;
+    NSUInteger length = NSUIntegerMax;
     
     NSData *nextChunk = _dataFetchBlock(_dataBlockState, length);
     if (!nextChunk || _dataBlockState.error)
@@ -51,11 +54,11 @@
     
     size = nextChunk.length;
     DCHECK(size <= length);
-    bcopy((char*)nextChunk.bytes, buffer, size);
     _offset += size;
     
-    return size;
+    return nextChunk;
 }
+
 
 - (void)close {
     _dataPostBlock(_dataBlockState);
