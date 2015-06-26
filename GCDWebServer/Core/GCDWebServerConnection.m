@@ -523,6 +523,12 @@ static inline NSUInteger _ScanHexNumber(const void* bytes, NSUInteger size) {
         _virtualHEAD = YES;
       }
       NSDictionary* requestHeaders = ARC_BRIDGE_RELEASE(CFHTTPMessageCopyAllHeaderFields(_requestMessage));  // Header names are case-insensitive but CFHTTPMessageCopyAllHeaderFields() will standardize the common ones
+		
+		NSMutableDictionary *temp = [requestHeaders mutableCopy];
+		
+		[temp setObject:self.remoteAddressString forKey:@"RF-RemoteAddressString"];
+		requestHeaders = [temp copy];
+		
       NSURL* requestURL = ARC_BRIDGE_RELEASE(CFHTTPMessageCopyRequestURL(_requestMessage));
       if (requestURL) {
         requestURL = [self rewriteRequestURL:requestURL withMethod:requestMethod headers:requestHeaders];
