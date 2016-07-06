@@ -307,11 +307,13 @@ NS_ASSUME_NONNULL_END
           NSString* queryString = requestURL ? CFBridgingRelease(CFURLCopyQueryString((CFURLRef)requestURL, NULL)) : nil;  // Don't use -[NSURL query] to make sure query is not unescaped;
           NSDictionary* requestQuery = queryString ? GCDWebServerParseURLEncodedForm(queryString) : @{};
           if (requestMethod && requestURL && requestHeaders && requestPath && requestQuery) {
-            for (_handler in _server.handlers) {
-              _request = _handler.matchBlock(requestMethod, requestURL, requestHeaders, requestPath, requestQuery);
-              if (_request) {
-                break;
-              }
+	    @synchronized (_server) {
+              for (_handler in _server.handlers) {
+                _request = _handler.matchBlock(requestMethod, requestURL, requestHeaders, requestPath, requestQuery);
+                if (_request) {
+                  break;
+                }
+	      }
             }
             if (_request) {
               _request.localAddressData = self.localAddressData;

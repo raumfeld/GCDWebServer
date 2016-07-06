@@ -32,6 +32,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class GCDWebServerHandler;
+
 /**
  *  The GCDWebServerMatchBlock is called for every handler added to the
  *  GCDWebServer whenever a new HTTP request has started (i.e. HTTP headers have
@@ -338,9 +340,11 @@ extern NSString* const GCDWebServerAuthenticationMethod_DigestAccess;
  *  Handlers are called in a LIFO queue, so if multiple handlers can potentially
  *  respond to a given request, the latest added one wins.
  *
- *  @warning Addling handlers while the server is running is not allowed.
+ *  Adding and removing handlers during runtime is allowed.
+ *
+ *  Returns a reference to the newly added handler. Keep this reference, if you want to remove the handler later.
  */
-- (void)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)processBlock;
+- (GCDWebServerHandler*)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock processBlock:(GCDWebServerProcessBlock)processBlock;
 
 /**
  *  Adds to the server a handler that generates responses asynchronously when handling incoming HTTP requests.
@@ -348,14 +352,19 @@ extern NSString* const GCDWebServerAuthenticationMethod_DigestAccess;
  *  Handlers are called in a LIFO queue, so if multiple handlers can potentially
  *  respond to a given request, the latest added one wins.
  *
- *  @warning Addling handlers while the server is running is not allowed.
+ *  Adding and removing handlers during runtime is allowed.
+ *
+ *  Returns a reference to the newly added handler. Keep this reference, if you want to remove the handler later.
  */
-- (void)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock asyncProcessBlock:(GCDWebServerAsyncProcessBlock)processBlock;
+- (GCDWebServerHandler*)addHandlerWithMatchBlock:(GCDWebServerMatchBlock)matchBlock asyncProcessBlock:(GCDWebServerAsyncProcessBlock)processBlock;
+
+/**
+ *  Removes the given handler from the server. See addHandlerWithMatchBlock:asyncProcessBlock:.
+ */
+- (void) removeHandler: (GCDWebServerHandler *) handler;
 
 /**
  *  Removes all handlers previously added to the server.
- *
- *  @warning Removing handlers while the server is running is not allowed.
  */
 - (void)removeAllHandlers;
 
