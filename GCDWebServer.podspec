@@ -18,7 +18,9 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = '9.0'
   s.osx.deployment_target = '10.7'
   s.requires_arc = true
-  
+
+  s.default_subspec = 'Core'
+
   s.subspec 'Core' do |cs|
     cs.source_files = 'GCDWebServer/**/*.{h,m}'
     cs.private_header_files = "GCDWebServer/Core/GCDWebServerPrivate.h"
@@ -37,7 +39,6 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'WebDAV' do |cs|
-    cs.default_subspec = 'Core'
 
     cs.subspec "Core" do |ccs|
       ccs.dependency 'GCDWebServer/Core'
@@ -56,8 +57,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'WebUploader' do |cs|
-    cs.default_subspec = 'Core'
-
+    
     cs.subspec "Core" do |ccs|
       ccs.dependency 'GCDWebServer/Core'
       ccs.source_files = 'GCDWebUploader/*.{h,m}'
