@@ -227,7 +227,7 @@ static void _ExecuteMainThreadRunLoopSources() {
 #endif
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE && !defined TARGET_OS_IPHONE_EXTENSION
 
 // Always called on main thread
 - (void)_startBackgroundTask {
@@ -254,7 +254,7 @@ static void _ExecuteMainThreadRunLoopSources() {
   _connected = YES;
   GWS_LOG_DEBUG(@"Did connect");
   
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE && !defined TARGET_OS_IPHONE_EXTENSION
   if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground) {
     [self _startBackgroundTask];
   }
@@ -286,7 +286,7 @@ static void _ExecuteMainThreadRunLoopSources() {
   });
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE && !defined TARGET_OS_IPHONE_EXTENSION
 
 // Always called on main thread
 - (void)_endBackgroundTask {
@@ -310,7 +310,7 @@ static void _ExecuteMainThreadRunLoopSources() {
   _connected = NO;
   GWS_LOG_DEBUG(@"Did disconnect");
   
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE && !defined TARGET_OS_IPHONE_EXTENSION
   [self _endBackgroundTask];
 #endif
   
@@ -769,7 +769,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
 - (BOOL)startWithOptions:(NSDictionary*)options error:(NSError**)error {
   if (_options == nil) {
     _options = options ? [options copy] : @{};
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE && !defined TARGET_OS_IPHONE_EXTENSION
     _suspendInBackground = [_GetOption(_options, GCDWebServerOption_AutomaticallySuspendInBackground, @YES) boolValue];
     if (((_suspendInBackground == NO) || ([[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground)) && ![self _start:error])
 #else
