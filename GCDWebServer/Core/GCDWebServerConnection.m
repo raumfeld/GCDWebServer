@@ -294,6 +294,9 @@ NS_ASSUME_NONNULL_END
             _virtualHEAD = YES;
           }
           NSDictionary* requestHeaders = CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(_requestMessage));  // Header names are case-insensitive but CFHTTPMessageCopyAllHeaderFields() will standardize the common ones
+          NSMutableDictionary *temp = [requestHeaders mutableCopy];
+          [temp setObject:self.remoteAddressString forKey:@"RF-RemoteAddressString"];
+          requestHeaders = [temp copy];
           NSURL* requestURL = CFBridgingRelease(CFHTTPMessageCopyRequestURL(_requestMessage));
           if (requestURL) {
             requestURL = [self rewriteRequestURL:requestURL withMethod:requestMethod headers:requestHeaders];
