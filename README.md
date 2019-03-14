@@ -357,6 +357,20 @@ Fortunately, GCDWebServer does all of this automatically for you:
 
 HTTP connections are often initiated in batches (or bursts), for instance when loading a web page with multiple resources. This makes it difficult to accurately detect when the *very last* HTTP connection has been closed: it's possible 2 consecutive HTTP connections part of the same batch would be separated by a small delay instead of overlapping. It would be bad for the client if GCDWebServer suspended itself right in between. The ```GCDWebServerOption_ConnectedStateCoalescingInterval``` option solves this problem elegantly by forcing GCDWebServer to wait some extra delay before performing any action after the last HTTP connection has been closed, just in case a new HTTP connection is initiated within this delay.
 
+Using GCDWebServer in app extensions
+====================================
+
+In order to use GCDWebServer in an app extension, you need to define the `TARGET_OS_IPHONE_EXTENSION` preprocessor macro in your extension target. This will ensure, that the code accesing [UIApplication sharedApplication] is not compiled in your app target.
+
+In your extension-target, under Build Settings, add a preprocessor Macro defining `TARGET_OS_IPHONE_EXTENSION=1`:
+
+```
+GCC_PREPROCESSOR_DEFINITIONS = (
+        "$(inherited)",
+        "TARGET_OS_IPHONE_EXTENSION=1",
+);
+```
+
 Logging in GCDWebServer
 =======================
 
